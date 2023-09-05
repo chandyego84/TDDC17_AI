@@ -85,7 +85,33 @@ public class CustomGraphSearch implements SearchObject {
 		DEPTH-FIRST SEARCH
 		********************/
 		else {
-			
+			// Label root node as explored
+			SearchNode rootNode = frontier.peekAtFront();
+			explored.add(rootNode);
+
+			// While frontier is not empty -- there are still nodes/tiles to explore
+			while (!frontier.isEmpty()) {
+				// Pop node
+				SearchNode currNode = frontier.removeFirst();
+				GridPos currState = currNode.getState();
+				if (p.isGoalState(currState)) {
+					// Found the goal state, break to return path to goal state
+					path = currNode.getPathFromRoot();
+					break;
+				}
+
+				ArrayList<GridPos> childStates = p.getReachableStatesFrom(currState);
+
+				for (GridPos childState: childStates) {
+					// For each child of the popped node
+					// if child is not explored, mark as explored and add to frontier
+					SearchNode childNode = new SearchNode(childState, currNode); // ensure childNode is given its parent
+					if (!explored.contains(childNode)) {
+						explored.add(childNode);
+						frontier.addNodeToFront(childNode);
+					}
+				}
+			}
 		}
 		/* Some hints:
 		 * -Read early part of chapter 3 in the book!
