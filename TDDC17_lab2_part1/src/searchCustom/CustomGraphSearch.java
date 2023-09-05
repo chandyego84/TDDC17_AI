@@ -86,13 +86,13 @@ public class CustomGraphSearch implements SearchObject {
 		********************/
 		else {
 			// Label root node as explored
-			SearchNode rootNode = frontier.peekAtFront();
+			SearchNode rootNode = frontier.peekAtBack();
 			explored.add(rootNode);
 
 			// While frontier is not empty -- there are still nodes/tiles to explore
 			while (!frontier.isEmpty()) {
 				// Pop node
-				SearchNode currNode = frontier.removeFirst();
+				SearchNode currNode = frontier.removeLast();
 				GridPos currState = currNode.getState();
 				if (p.isGoalState(currState)) {
 					// Found the goal state, break to return path to goal state
@@ -108,7 +108,7 @@ public class CustomGraphSearch implements SearchObject {
 					SearchNode childNode = new SearchNode(childState, currNode); // ensure childNode is given its parent
 					if (!explored.contains(childNode)) {
 						explored.add(childNode);
-						frontier.addNodeToFront(childNode);
+						frontier.addNodeToBack(childNode);
 					}
 				}
 			}
