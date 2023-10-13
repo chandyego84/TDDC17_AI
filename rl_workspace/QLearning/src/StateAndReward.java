@@ -21,7 +21,8 @@ public class StateAndReward {
 
 		/* TODO: IMPLEMENT THIS FUNCTION */
 		// Reward: Higher reward for facing up (greater difference between max/min and actual angle)
-		double reward = Math.PI - Math.abs(angle);
+		double reward = 1 - (Math.abs(angle) / Math.PI);		
+		
 		return reward;
 	}
 
@@ -29,19 +30,46 @@ public class StateAndReward {
 	public static String getStateHover(double angle, double vx, double vy) {
 
 		/* TODO: IMPLEMENT THIS FUNCTION */
-
-		String state = "OneStateToRuleThemAll2";
+		int nrValues = 4;	
+			
+		// want the rocket to be as close to 0.0 vx and 0.0 vy, so anything it's either in state 0.0 or not in state 0.0
+		double minV = -1.0;
+		double maxV = 1.0;
+		
+		String discreteVx = "Vx State: " + discretize(vy, nrValues, minV, maxV) + " ";
+		String discreteVy = "Vy State: " + discretize(vy, nrValues, minV, maxV) + " ";
+		
+		// include getStateAngle as well -- for part III; part II only needs angle, part III needs the velocities and angle
+		String state = discreteVx + discreteVy + getStateAngle(angle, vx, vy);
 		
 		return state;
+
 	}
 
 	/* Reward function for the full hover controller */
+	// The closer to zero for vx and vy, the better (hovering at the middle)
 	public static double getRewardHover(double angle, double vx, double vy) {
 
 		/* TODO: IMPLEMENT THIS FUNCTION */
+		double rewardSensitivity = 1.5;
 		
-		double reward = 0;
-
+		// angle is critical for hovering -- give more sensitivity
+		double angleReward = Math.pow(getRewardAngle(angle, vx, vy), 2);
+		
+		// closer to 0.0 vx and vy, the better
+		double vxReward = 0.0;
+		if (Math.abs(vx) < 1.0) {
+			vxReward = 1 - (Math.abs(vx) / 1.0);
+		}
+		
+		double vyReward = 0.0;
+		if (Math.abs(vy) < 1.0) {
+			vyReward = 1 - (Math.abs(vy) / 1.0);	
+		}
+		
+		// avg reward of all components
+		double reward = (vyReward + vxReward + angleReward) / 3;
+		
 		return reward;
 	}
 

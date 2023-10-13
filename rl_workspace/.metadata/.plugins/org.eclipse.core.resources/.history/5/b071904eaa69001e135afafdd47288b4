@@ -1,0 +1,121 @@
+public class StateAndReward {
+
+	
+	/* State discretization function for the angle controller */
+	public static String getStateAngle(double angle, double vx, double vy) {
+
+		/* TODO: IMPLEMENT THIS FUNCTION */
+		int nStates = 8; // number of discrete states; 45 degrees per state
+		double minStateValue = -Math.PI;
+		double maxStateValue = Math.PI;
+		
+		int discreteAngleState = discretize2(angle, nStates, minStateValue, maxStateValue); // angles don't go below -PI or above PI
+		
+		String state = " Angle State: " + discreteAngleState;
+
+		return state;
+	}
+
+	/* Reward function for the angle controller */
+	public static double getRewardAngle(double angle, double vx, double vy) {
+
+		/* TODO: IMPLEMENT THIS FUNCTION */
+		// Reward: Higher reward for facing up (greater difference between max/min and actual angle)
+		double reward = Math.PI - Math.abs(angle);
+		
+		return reward;
+	}
+
+	/* State discretization function for the full hover controller */
+	public static String getStateHover(double angle, double vx, double vy) {
+
+		/* TODO: IMPLEMENT THIS FUNCTION */
+		int nrValues = 5;
+		// we want the rocket to be as close to 0 vX and vY		double minV = -0.5;
+		double maxV = 0.5;
+		
+		String discreteVx = "Vx State: " + discretize(vx, nrValues, minV, maxV) + " ";
+		String discreteVy = "Vy State: " + discretize(vy, nrValues, minV, maxV) + " ";
+		
+		// include getStateAngle as well -- for part III; part II only needs angle, part III needs the velocities and angle
+		String state = discreteVx + discreteVy + getStateAngle(angle, vx, vy);
+		
+		return state;
+
+	}
+
+	/* Reward function for the full hover controller */
+	// The closer to zero for vx and vy, the better (hovering at the middle)
+	public static double getRewardHover(double angle, double vx, double vy) {
+
+		/* TODO: IMPLEMENT THIS FUNCTION */
+		double angleReward = getRewardAngle(angle, vx, vy);
+	    double hoverReward = 1.0 / (Math.abs(vx) + Math.abs(vy) + 1.0); // add 1.0 to avoid division by zero
+
+		double reward = angleReward + hoverReward;
+		
+		return reward;
+	}
+
+	// ///////////////////////////////////////////////////////////
+	// discretize() performs a uniform discretization of the
+	// value parameter.
+	// It returns an integer between 0 and nrValues-1.
+	// The min and max parameters are used to specify the interval
+	// for the discretization.
+	// If the value is lower than min, 0 is returned
+	// If the value is higher than min, nrValues-1 is returned
+	// otherwise a value between 1 and nrValues-2 is returned.
+	//
+	// Use discretize2() if you want a discretization method that does
+	// not handle values lower than min and higher than max.
+	// ///////////////////////////////////////////////////////////
+	public static int discretize(double value, int nrValues, double min,
+			double max) {
+		if (nrValues < 2) {
+			return 0;
+		}
+
+		double diff = max - min;
+
+		if (value < min) {
+			return 0;
+		}
+		if (value > max) {
+			return nrValues - 1;
+		}
+
+		double tempValue = value - min;
+		double ratio = tempValue / diff;
+
+		return (int) (ratio * (nrValues - 2)) + 1;
+	}
+
+	// ///////////////////////////////////////////////////////////
+	// discretize2() performs a uniform discretization of the
+	// value parameter.
+	// It returns an integer between 0 and nrValues-1.
+	// The min and max parameters are used to specify the interval
+	// for the discretization.
+	// If the value is lower than min, 0 is returned
+	// If the value is higher than min, nrValues-1 is returned
+	// otherwise a value between 0 and nrValues-1 is returned.
+	// ///////////////////////////////////////////////////////////
+	public static int discretize2(double value, int nrValues, double min,
+			double max) {
+		double diff = max - min;
+
+		if (value < min) {
+			return 0;
+		}
+		if (value > max) {
+			return nrValues - 1;
+		}
+
+		double tempValue = value - min;
+		double ratio = tempValue / diff;
+
+		return (int) (ratio * nrValues);
+	}
+
+}

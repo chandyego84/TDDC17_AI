@@ -1,0 +1,135 @@
+import java.lang.Math;
+//original
+
+public class StateAndReward {
+
+	/* State discretization function for the angle controller */
+	public static String getStateAngle(double angle, double vx, double vy) {
+			
+			/* TODO: IMPLEMENT THIS FUNCTION */
+			
+			String state =  Integer.toString(StateAndReward.discretize(angle, 10, -3.1415926, 3.1415926));
+			return ("ang:" + state);
+		}
+
+	/* Reward function for the angle controller */
+	public static double getRewardAngle(double angle, double vx, double vy) {
+		
+		/* TODO: IMPLEMENT THIS FUNCTION */
+		double reward = 0;
+		if (Math.abs(angle) < 3.1415926) {
+			reward = 1 - (Math.abs(angle) / 3.1415926);
+		}
+		else {
+			reward = 0;
+		}
+		
+		return reward;
+	}
+	
+	public static double getRewardV(double v, double max_value) {
+		double reward = 0;
+		if (Math.abs(v) < 1) {
+			reward = 1 - (Math.abs(v) / max_value);
+		}
+		else {
+			return 0;
+		}
+		
+		return reward;
+	}
+
+	/* State discretization function for the full hover controller */
+	public static String getStateHover(double angle, double vx, double vy) {
+		/* TODO: IMPLEMENT THIS FUNCTION */
+		String angleState = StateAndReward.getStateAngle(angle, vx, vy);
+		String vxState = Integer.toString(discretize2(vx, 5, -1, 1));
+		String vyState = Integer.toString(discretize2(vy, 5, -1, 1));
+		String finalState = angleState + "vx: " + vxState + "vy:" + vyState;
+		
+		return finalState;
+	}
+
+	/* Reward function for the full hover controller */
+	public static double getRewardHover(double angle, double vx, double vy) {
+		
+		/* TODO: IMPLEMENT THIS FUNCTION */		
+		double angleReward = Math.pow(StateAndReward.getRewardAngle(angle, vx, vy), 2);
+		
+		double vxReward = StateAndReward.getRewardV(vx, 1);
+		double vyReward = StateAndReward.getRewardV(vy, 3);
+		//double finalReward = Math.pow((angleReward + vxReward + vyReward) / 3,3);
+		double finalReward_wth_pow = (angleReward + vxReward + vyReward) / 3;
+		/*if (QLearningController.iteration >= 190000) {
+			System.out.println(finalReward_wth_pow);
+			System.out.println(finalReward);
+		}*/
+		
+		return finalReward_wth_pow;
+	}
+
+	// ///////////////////////////////////////////////////////////
+	// discretize() performs a uniform discretization of the
+	// value parameter.
+	// It returns an integer between 0 and nrValues-1.
+	// The min and max parameters are used to specify the interval
+	// for the discretization.
+	// If the value is lower than min, 0 is returned
+	// If the value is higher than min, nrValues-1 is returned
+	// otherwise a value between 1 and nrValues-2 is returned.
+	//
+	// Use discretize2() if you want a discretization method that does
+	// not handle values lower than min and higher than max.
+	// ///////////////////////////////////////////////////////////
+	public static int discretize(double value, int nrValues, double min,
+			double max) {
+
+		if (nrValues < 2) {
+			return 0;
+		}
+
+		double diff = max - min;
+
+		if (value < min) {
+			return 0;
+		}
+		if (value > max) {
+			return nrValues - 1;
+		}
+
+		double tempValue = value - min;
+		double ratio = tempValue / diff;
+		double return_double = (ratio * (nrValues - 2)) + 1;
+		int return_value = (int) return_double;
+		
+		return return_value;
+	}
+
+	// ///////////////////////////////////////////////////////////
+	// discretize2() performs a uniform discretization of the
+	// value parameter.
+	// It returns an integer between 0 and nrValues-1.
+	// The min and max parameters are used to specify the interval
+	// for the discretization.
+	// If the value is lower than min, 0 is returned
+	// If the value is higher than min, nrValues-1 is returned
+	// otherwise a value between 0 and nrValues-1 is returned.
+	// ///////////////////////////////////////////////////////////
+	public static int discretize2(double value, int nrValues, double min,
+			double max) {
+		double diff = max - min;
+
+		if (value < min) {
+			return 0;
+		}
+		if (value > max) {
+			return nrValues - 1;
+		}
+
+		double tempValue = value - min;
+		double ratio = tempValue / diff;
+
+		return (int) (ratio * nrValues);
+	}
+
+}

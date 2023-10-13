@@ -24,6 +24,8 @@ public class TutorialController extends Controller {
      * leftRocket.setBursting(true) turns on the left rocket 
      */
 	
+	int printCounter;
+	
 	public void init() {
 		cso = (ComposedSpringObject) object;
 		x = (DoubleFeature) cso.getObjectById("x");
@@ -31,6 +33,7 @@ public class TutorialController extends Controller {
 		vx = (DoubleFeature) cso.getObjectById("vx");
 		vy = (DoubleFeature) cso.getObjectById("vy");
 		angle = (DoubleFeature) cso.getObjectById("angle");
+		printCounter = 0;
 
 		leftRocket = (RocketEngine) cso.getObjectById("rocket_engine_left");
 		rightRocket = (RocketEngine) cso.getObjectById("rocket_engine_right");
@@ -38,7 +41,7 @@ public class TutorialController extends Controller {
 	}
 
     public void tick(int currentTime) {
-
+    	printCounter += 1;
     	/* TODO: Part 1, No. 5 */
     	// Implement the tick() method so that it receives readings from the sensors "angle", "vx", "vy" 
     	// and prints them out on the standard output
@@ -46,16 +49,18 @@ public class TutorialController extends Controller {
 		Double vyValue = vy.getValue();
 		Double angleValue = angle.getValue();
 		
-		// System.out.println("VX: " + vxValue);
-		// System.out.println("VY: " + vyValue);
-		System.out.println("Angle: " + angleValue);
+		if (printCounter % 100 == 0) {
+			//System.out.println("VX: " + vxValue);
+			//System.out.println("VY: " + vyValue);
+			System.out.println("Angle: " + angleValue);
+		}
 		
 		/*TODO: Part 1, No. 7*/
 		// Set the rockets to fire or stop if "vy" or some other sensor falls below/above some threshold
-		if (vxValue > 1) {
-			// rocket stops if vx too high
-			middleRocket.setBursting(false);
-		}
+		//if (vxValue > 1) {
+		//	// rocket stops if vx too high
+		//	middleRocket.setBursting(false);
+		//}
     }
 
 }
